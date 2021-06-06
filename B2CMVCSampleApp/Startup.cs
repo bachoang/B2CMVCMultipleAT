@@ -35,8 +35,8 @@ namespace B2CMVCSampleApp
         string MetadataAddr = String.Format(System.Globalization.CultureInfo.InvariantCulture, System.Configuration.ConfigurationManager.AppSettings["B2CMetaData"], SignUpSignInPolicy);
         string AppSecret = System.Configuration.ConfigurationManager.AppSettings["Secret"];
 
-        string[] scope1 = new string[] { "https://hellob2c.onmicrosoft.com/demoapi/read" };
-        string[] scope2 = new string[] { "https://hellob2c.onmicrosoft.com/62608dd6-54d6-455e-8c83-7195c24c4509/read2" };
+        string[] scope1 = new string[] { "<web API 1 scope>" };
+        string[] scope2 = new string[] { "<web API 2 scope>" };
         /// <summary>
         /// Configure OWIN to use OpenIdConnect
         /// </summary>
@@ -55,7 +55,6 @@ namespace B2CMVCSampleApp
                     RedirectUri = redirectUri,
                     // PostLogoutRedirectUri is the page that users will be redirected to after sign-out. In this case, it is using the home page
                     PostLogoutRedirectUri = redirectUri,
-                    // MetadataAddress = "https://hellob2c.b2clogin.com/hellob2c.onmicrosoft.com/B2C_1_signupsignin1/v2.0/.well-known/openid-configuration",
                     MetadataAddress = MetadataAddr,
                     Scope = OpenIdConnectScope.OpenIdProfile,
                     // ResponseType is set to request the code id_token - which contains basic information about the signed-in user
@@ -94,7 +93,6 @@ namespace B2CMVCSampleApp
             var myval = notification.OwinContext.Get<string>("GetAT2");
             if (!string.IsNullOrEmpty(myval))
             {
-                // notification.ProtocolMessage.Scope = $"openid profile offline_access https://hellob2c.onmicrosoft.com/62608dd6-54d6-455e-8c83-7195c24c4509/read2";
                 notification.ProtocolMessage.Scope = $"openid profile offline_access {scope2[0]}";
                 HttpCookie cookie = new HttpCookie("2ndatcookie");
                 cookie.Value = "true";
@@ -106,8 +104,7 @@ namespace B2CMVCSampleApp
 
         private async Task OnAuthorizationCodeReceived(AuthorizationCodeReceivedNotification notification)
         {
-            // string[] scopes = new string[] { "https://hellob2c.onmicrosoft.com/demoapi/read"};
-            // string[] scope2 = new string[] { "https://hellob2c.onmicrosoft.com/62608dd6-54d6-455e-8c83-7195c24c4509/read2" };
+
             IConfidentialClientApplication app;
 
             String mycookie = "";
@@ -115,10 +112,8 @@ namespace B2CMVCSampleApp
                 mycookie = HttpContext.Current.Request.Cookies["2ndatcookie"].Value;
 
             app = ConfidentialClientApplicationBuilder.Create(clientId)
-           // .WithClientSecret("Ph9mBO9Gg98D4S8oq8ks.SlE5u~t.9u.3G")
            .WithClientSecret(AppSecret)
            .WithRedirectUri(redirectUri)
-           // .WithB2CAuthority("https://hellob2c.b2clogin.com/tfp/hellob2c.onmicrosoft.com/B2C_1_signupsignin1")
            .WithB2CAuthority(B2CAuthority)
            .Build();
 
